@@ -38,6 +38,8 @@ public class Game extends BasicGame {
 	private Vector2f ballVelocity;
 	
 	private boolean hitting;
+	private boolean moving;
+	private boolean start;
 	
 	private int scoreLeft;
 	private int scoreRight;
@@ -62,11 +64,12 @@ public class Game extends BasicGame {
 		
 		ball = new Circle(400, 300, BALL_RADIUS);
 		paddleLeft = new RoundedRectangle(5, 350 - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, CORNER_ANGLE);
-		paddleRight = new RoundedRectangle(800 - 15, 350 - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, CORNER_ANGLE);
+		paddleRight = new RoundedRectangle(SCREEN_WIDTH - 15, 350 - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, CORNER_ANGLE);
 		foreground = new Rectangle(25, 15, SCREEN_WIDTH - 50, SCREEN_HEIGHT - 30);
 		ballVelocity = new Vector2f(-3, 1);
 		scoreLeft = 0;
 		scoreRight = 0;
+		start = true;
 	}
 	
 	
@@ -96,21 +99,35 @@ public class Game extends BasicGame {
 		yL = paddleLeft.getY();
 		yR = paddleRight.getY();
 		
-		if (input.isKeyDown(Input.KEY_UP) && (yL >= 0))
+		if (input.isKeyDown(Input.KEY_UP) && (yL >= 0)) {
 	        paddleLeft.setY(yL - paddle_distance);
-		if (input.isKeyDown(Input.KEY_DOWN) && (yL < (600 - PADDLE_HEIGHT)))
+	        moving = true;
+	        start = false;
+		}
+		if (input.isKeyDown(Input.KEY_DOWN) && (yL < (600 - PADDLE_HEIGHT))) {
 	        paddleLeft.setY(yL + paddle_distance);
-		if (input.isKeyDown(Input.KEY_W) && (yR >= 0))
+	        moving = true;
+	        start = false;
+		}
+		if (input.isKeyDown(Input.KEY_W) && (yR >= 0)) {
 	        paddleRight.setY(yR - paddle_distance);
-		if (input.isKeyDown(Input.KEY_S) && (yR < (600 - PADDLE_HEIGHT)))
+	        moving = true;
+	        start = false;
+		}
+		if (input.isKeyDown(Input.KEY_S) && (yR < (600 - PADDLE_HEIGHT))) {
 	        paddleRight.setY(yR + paddle_distance);
+	        moving = true;
+	        start = false;
+		}
 			
 		if (ball.getMinX() <= 0) {
 			scoreRight++;
 			ball.setLocation(400, 300);
+			start = true;
 		} else if (ball.getMaxX() >= SCREEN_WIDTH) {
 			scoreLeft++;
 			ball.setLocation(400, 300);
+			start = true;
 		}
 		
 		if (ball.intersects(paddleLeft) || ball.intersects(paddleRight)) {
@@ -125,7 +142,8 @@ public class Game extends BasicGame {
 		else if (ball.getMaxY() >= SCREEN_HEIGHT) 
 			ballVelocity.setY(-ballVelocity.getY());
 		
-		ball.setLocation(ball.getX() + ballVelocity.getX() * ball_distance, ball.getY() + ballVelocity.getY() * ball_distance);
+		if (!start && moving)
+			ball.setLocation(ball.getX() + ballVelocity.getX() * ball_distance, ball.getY() + ballVelocity.getY() * ball_distance);
 	}
 	
 	
